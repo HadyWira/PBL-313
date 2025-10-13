@@ -5,6 +5,8 @@ import 'vehicle_selection_screen.dart';
 import 'profile_screen.dart';
 import 'donasi_simulasi_screen.dart';
 
+
+
 class HomeScreen extends StatefulWidget {
   final String username;
 
@@ -76,7 +78,7 @@ class _HomeScreenState extends State<HomeScreen> {
       bottomNavigationBar: BottomNavigationBar(
         type: BottomNavigationBarType.fixed,
         currentIndex: _currentIndex,
-        backgroundColor: const Color(0xFF2E7D32),
+        backgroundColor: const Color(0xFF3E5F44),
         selectedItemColor: Colors.white,
         unselectedItemColor: Colors.white70,
         onTap: (index) {
@@ -122,7 +124,7 @@ class _HomeScreenState extends State<HomeScreen> {
               padding: const EdgeInsets.all(20),
               decoration: const BoxDecoration(
                 gradient: LinearGradient(
-                  colors: [Color(0xFF2E7D32), Color(0xFF66BB6A)],
+                  colors: [Color(0xFF3E5F44), Color(0xFF66BB6A)],
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
                 ),
@@ -136,8 +138,8 @@ class _HomeScreenState extends State<HomeScreen> {
                       Expanded(
                         child: Text(
                           widget.username.isNotEmpty
-                              ? "Hai, ${widget.username}! 🌱"
-                              : "Selamat Datang di EcoTrack 🌱",
+                              ? "Hai, ${widget.username}! "
+                              : "Selamat Datang di EcoTrack ",
                           style: const TextStyle(
                             color: Colors.white,
                             fontSize: 20,

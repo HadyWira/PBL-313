@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'home_screen.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -21,7 +22,7 @@ class _LoginScreenState extends State<LoginScreen>
 
   final Color softGreen = const Color(0xFFE6F4EA);
   final Color mintGreen = const Color(0xFFBFE3C0);
-  final Color tealColor = const Color(0xFF5DBB63);
+  final Color tealColor = const Color(0xFF3E5F44);
   final Color darkText = const Color(0xFF2E3A3A);
 
   @override
@@ -71,24 +72,26 @@ class _LoginScreenState extends State<LoginScreen>
     }
   }
 
-  // 🌱 1. Welcome Page
+  //  1. Welcome Page
   Widget _welcomePage() {
     return _pageWrapper(
-      title: "Selamat Datang 🌿",
-      subtitle: "Jejak hijau dimulai dari sini.",
+      title: "Hitung Jejakmu, Hijaukan bumi",
+      subtitle: "Catat emisi kendaraanmu, donasikan kebaikanmu",
+      titleOutside: true,
+      useContainer: true,
       children: [
         _animatedButton("Masuk", () => switchPage("login")),
         const SizedBox(height: 14),
-        _outlinedButton("Buat Akun Baru", () => switchPage("register")),
+        _outlinedButton("Registrasi", () => switchPage("register")),
       ],
     );
   }
 
-  // 🌿 2. Login Page
+  //  2. Login Page
   Widget _loginPage() {
     return _pageWrapper(
-      title: "Masuk Akun",
-      subtitle: "Masuk untuk melanjutkan perjalanan hijau Anda.",
+      title: "Masuk",
+      subtitle: "Silahkan isi data anda sebelum masuk",
       children: [
         _inputField("Email", icon: Icons.email_outlined),
         const SizedBox(height: 16),
@@ -108,7 +111,8 @@ class _LoginScreenState extends State<LoginScreen>
         const SizedBox(height: 10),
         TextButton(
           onPressed: () => switchPage("forgot"),
-          child: const Text("Lupa kata sandi?", style: TextStyle(color: Colors.black54)),
+          child: const Text("Lupa kata sandi?",
+              style: TextStyle(color: Colors.black54)),
         ),
         TextButton(
           onPressed: () => switchPage("register"),
@@ -119,11 +123,11 @@ class _LoginScreenState extends State<LoginScreen>
     );
   }
 
-  // 🌿 3. Register Page
+  //  3. Register Page
   Widget _registerPage() {
     return _pageWrapper(
-      title: "Buat Akun Baru",
-      subtitle: "Mulai langkah hijau Anda bersama kami.",
+      title: "Daftar",
+      subtitle: "Silahkan isi data anda untuk mendaftar.",
       children: [
         _inputField("Nama Lengkap", icon: Icons.person_outline),
         const SizedBox(height: 12),
@@ -131,7 +135,8 @@ class _LoginScreenState extends State<LoginScreen>
         const SizedBox(height: 12),
         _inputField("Password", icon: Icons.lock_outline, obscure: true),
         const SizedBox(height: 12),
-        _inputField("Konfirmasi Password", icon: Icons.lock_reset, obscure: true),
+        _inputField("Konfirmasi Password",
+            icon: Icons.lock_reset, obscure: true),
         const SizedBox(height: 28),
         _animatedButton("Daftar", () => switchPage("verify")),
         const SizedBox(height: 10),
@@ -144,7 +149,7 @@ class _LoginScreenState extends State<LoginScreen>
     );
   }
 
-  // 🌿 4. Verify Account Page
+  //  4. Verify Account Page
   Widget _verifyPage() {
     return _pageWrapper(
       title: "Verifikasi Akun Anda",
@@ -175,7 +180,7 @@ class _LoginScreenState extends State<LoginScreen>
     );
   }
 
-  // 🌿 5. Forgot Password Page
+  //  5. Forgot Password Page
   Widget _forgotPasswordPage() {
     return _pageWrapper(
       title: "Lupa Kata Sandi",
@@ -194,56 +199,127 @@ class _LoginScreenState extends State<LoginScreen>
     );
   }
 
-  // ✨ Wrapper untuk setiap halaman
+  //  Wrapper halaman
   Widget _pageWrapper({
     required String title,
     String? subtitle,
     required List<Widget> children,
+    bool titleOutside = false,
+    bool useContainer = true,
   }) {
     return SafeArea(
       child: Center(
         child: SingleChildScrollView(
           padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 30),
           child: Column(
+            mainAxisSize: MainAxisSize.min,
             children: [
-              const Icon(Icons.eco, size: 90, color: Color(0xFF5DBB63)),
-              const SizedBox(height: 18),
-              Text(
-                title,
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  fontSize: 26,
-                  fontWeight: FontWeight.bold,
-                  color: darkText,
-                ),
+              Image.asset(
+                'assets/logo.png',
+                width: 125,
+                height: 125,
               ),
-              if (subtitle != null) ...[
-                const SizedBox(height: 8),
+
+              const SizedBox(height: 18),
+
+              //  Title di luar container
+              if (titleOutside) ...[
                 Text(
-                  subtitle,
+                  title,
                   textAlign: TextAlign.center,
-                  style: TextStyle(
-                    color: Colors.grey[700],
-                    fontSize: 15,
+                  style: GoogleFonts.poppins(
+                    fontSize: 26,
+                    fontWeight: FontWeight.bold,
+                    color: darkText,
                   ),
                 ),
-              ],
-              const SizedBox(height: 28),
-              Container(
-                padding: const EdgeInsets.all(24),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(20),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.green.withOpacity(0.1),
-                      blurRadius: 15,
-                      offset: const Offset(0, 6),
+                if (subtitle != null) ...[
+                  const SizedBox(height: 6),
+                  Text(
+                    subtitle,
+                    textAlign: TextAlign.center,
+                    style: GoogleFonts.poppins(
+                      fontSize: 15,
+                      color: Colors.grey[700],
                     ),
-                  ],
+                  ),
+                ],
+                const SizedBox(height: 24),
+              ],
+
+              // 🌱 Kalau pakai container
+              if (useContainer)
+                Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.all(24),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(20),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.green.withOpacity(0.1),
+                        blurRadius: 15,
+                        offset: const Offset(0, 6),
+                      ),
+                    ],
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      if (!titleOutside) ...[
+                        Text(
+                          title,
+                          style: GoogleFonts.poppins(
+                            fontSize: 24,
+                            fontWeight: FontWeight.bold,
+                            color: darkText,
+                          ),
+                        ),
+                        if (subtitle != null) ...[
+                          const SizedBox(height: 8),
+                          Text(
+                            subtitle,
+                            style: GoogleFonts.poppins(
+                              fontSize: 15,
+                              color: Colors.grey[700],
+                            ),
+                          ),
+                        ],
+                        const SizedBox(height: 20),
+                      ],
+                      ...children,
+                    ],
+                  ),
                 ),
-                child: Column(children: children),
-              ),
+
+              // 🌿 Kalau tanpa container
+              if (!useContainer && !titleOutside) ...[
+                Text(
+                  title,
+                  textAlign: TextAlign.center,
+                  style: GoogleFonts.poppins(
+                    fontSize: 26,
+                    fontWeight: FontWeight.bold,
+                    color: darkText,
+                  ),
+                ),
+                if (subtitle != null) ...[
+                  const SizedBox(height: 8),
+                  Text(
+                    subtitle,
+                    textAlign: TextAlign.center,
+                    style: GoogleFonts.poppins(
+                      fontSize: 15,
+                      color: Colors.grey[700],
+                    ),
+                  ),
+                ],
+                const SizedBox(height: 24),
+                ...children,
+              ],
+
+              const SizedBox(height: 20),
             ],
           ),
         ),
@@ -251,9 +327,8 @@ class _LoginScreenState extends State<LoginScreen>
     );
   }
 
-  // 🧩 Input Field
-  Widget _inputField(String label,
-      {bool obscure = false, IconData? icon}) {
+  // 🌿 Input Field
+  Widget _inputField(String label, {bool obscure = false, IconData? icon}) {
     return TextField(
       obscureText: obscure,
       decoration: InputDecoration(
@@ -268,13 +343,13 @@ class _LoginScreenState extends State<LoginScreen>
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(14),
-          borderSide: BorderSide(color: Colors.teal, width: 1.8),
+          borderSide: const BorderSide(color: Colors.teal, width: 1.8),
         ),
       ),
     );
   }
 
-  // 🌿 Primary Button
+  // 🌿 Tombol utama
   Widget _animatedButton(String text, VoidCallback onPressed) {
     return SizedBox(
       width: double.infinity,
@@ -290,26 +365,26 @@ class _LoginScreenState extends State<LoginScreen>
         ),
         child: isLoading
             ? const SizedBox(
-          width: 24,
-          height: 24,
-          child: CircularProgressIndicator(
-            color: Colors.white,
-            strokeWidth: 3,
-          ),
-        )
+                width: 24,
+                height: 24,
+                child: CircularProgressIndicator(
+                  color: Colors.white,
+                  strokeWidth: 3,
+                ),
+              )
             : Text(
-          text,
-          style: const TextStyle(
-            fontSize: 17,
-            fontWeight: FontWeight.w600,
-            color: Colors.white,
-          ),
-        ),
+                text,
+                style: const TextStyle(
+                  fontSize: 17,
+                  fontWeight: FontWeight.w600,
+                  color: Colors.white,
+                ),
+              ),
       ),
     );
   }
 
-  // 🌿 Outlined Button
+  // 🌿 Tombol outline
   Widget _outlinedButton(String text, VoidCallback onPressed) {
     return SizedBox(
       width: double.infinity,
