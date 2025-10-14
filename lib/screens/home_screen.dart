@@ -1,11 +1,11 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'vehicle_selection_screen.dart';
 import 'profile_screen.dart';
 import 'donasi_simulasi_screen.dart';
-
-
+import 'package:google_fonts/google_fonts.dart';
 
 class HomeScreen extends StatefulWidget {
   final String username;
@@ -21,6 +21,8 @@ class _HomeScreenState extends State<HomeScreen> {
   double _offsetEmission = 0.0;
   double _belumOffset = 0.0;
   int _currentIndex = 2;
+
+  static const Color primaryGreen = Color(0xFF3E5F44); // 🌿 warna utama baru
 
   @override
   void initState() {
@@ -47,43 +49,22 @@ class _HomeScreenState extends State<HomeScreen> {
       _offsetEmission = offset;
       _belumOffset = belumOffset;
     });
-
-    await prefs.setDouble('totalEmisiGlobal', sum);
-    await prefs.setDouble('belumOffset', belumOffset);
   }
 
-  Future<void> _resetEmission() async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.remove('trip_history');
-    await prefs.remove('totalOffset');
-    await prefs.remove('totalEmisiGlobal');
-    await prefs.remove('belumOffset');
-    setState(() {
-      _totalEmission = 0.0;
-      _offsetEmission = 0.0;
-      _belumOffset = 0.0;
-    });
-  }
-
-  Future<void> _refreshAfterNavigate() async {
-    await _loadEmissionData();
-  }
+  Future<void> _refreshAfterNavigate() async => _loadEmissionData();
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF5F8F5),
-
-      // 🌿 Bottom Navigation
+      backgroundColor: primaryGreen,
       bottomNavigationBar: BottomNavigationBar(
         type: BottomNavigationBarType.fixed,
         currentIndex: _currentIndex,
-        backgroundColor: const Color(0xFF3E5F44),
+        backgroundColor: primaryGreen,
         selectedItemColor: Colors.white,
         unselectedItemColor: Colors.white70,
         onTap: (index) {
           setState(() => _currentIndex = index);
-
           if (index == 0) {
             Navigator.push(
               context,
@@ -113,198 +94,214 @@ class _HomeScreenState extends State<HomeScreen> {
           BottomNavigationBarItem(icon: Icon(Icons.person), label: "Profil"),
         ],
       ),
-
-      // 🌱 Body
       body: SafeArea(
-        child: Column(
+        child: Stack(
           children: [
-            // Header
-            Container(
-              width: double.infinity,
-              padding: const EdgeInsets.all(20),
-              decoration: const BoxDecoration(
-                gradient: LinearGradient(
-                  colors: [Color(0xFF3E5F44), Color(0xFF66BB6A)],
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                ),
-                borderRadius: BorderRadius.vertical(bottom: Radius.circular(30)),
+            // 🌿 Header.svg dijadikan background atas
+            Positioned.fill(
+              top: 0,
+              bottom: MediaQuery.of(context).size.height * 0.6, // hanya bagian atas
+              child: SvgPicture.asset(
+                'assets/header.svg',
+                fit: BoxFit.cover,
+                alignment: Alignment.topCenter,
               ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
+            ),
+
+            // 🌿 Konten utama
+            Column(
+              children: [
+                const SizedBox(height: 40),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                  child: Row(
                     children: [
                       Expanded(
                         child: Text(
                           widget.username.isNotEmpty
-                              ? "Hai, ${widget.username}! "
-                              : "Selamat Datang di EcoTrack ",
-                          style: const TextStyle(
+                              ? "Hai, ${widget.username}!"
+                              : "Selamat datang di EcoTrack",
+                          style: GoogleFonts.poppins(
                             color: Colors.white,
                             fontSize: 20,
-                            fontWeight: FontWeight.bold,
+                            fontWeight: FontWeight.w600,
                           ),
                         ),
                       ),
                       IconButton(
-                        icon: const Icon(Icons.refresh, color: Colors.white),
-                        onPressed: _loadEmissionData,
-                      ),
-                      IconButton(
-                        icon: const Icon(Icons.delete, color: Colors.white),
-                        onPressed: _resetEmission,
+                        onPressed: () {},
+                        icon: const Icon(Icons.notifications),
+                        color: Colors.white,
                       ),
                     ],
                   ),
-                  const SizedBox(height: 12),
+                ),
+                const SizedBox(height: 20),
 
-                  Container(
+                // 🔸 BODY PUTIH MELENGKUNG
+                Expanded(
+                  child: Container(
                     width: double.infinity,
-                    padding: const EdgeInsets.all(16),
-                    decoration: BoxDecoration(
+                    decoration: const BoxDecoration(
                       color: Colors.white,
-                      borderRadius: BorderRadius.circular(20),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withOpacity(0.08),
-                          blurRadius: 8,
-                          offset: const Offset(0, 4),
-                        )
-                      ],
+                      borderRadius: BorderRadius.only(
+                        topLeft: Radius.circular(30),
+                        topRight: Radius.circular(30),
+                      ),
                     ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Text("Total Emisi Karbon",
-                            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
-                        const SizedBox(height: 8),
-                        Text("${_totalEmission.toStringAsFixed(2)} kg CO₂",
-                            style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-                        const SizedBox(height: 12),
-                        Row(
-                          children: [
-                            Expanded(
-                              child: _buildStatCard(
-                                "Telah di-offset",
-                                "${_offsetEmission.toStringAsFixed(2)} kg",
-                                Colors.green.shade50,
+                    child: SingleChildScrollView(
+                      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          // 🌱 Total Emisi
+                          Padding(
+                            padding: const EdgeInsets.only(bottom: 12),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  "Total Emisi Karbon",
+                                  style: GoogleFonts.poppins(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w600,
+                                    color: Colors.black87,
+                                  ),
+                                ),
+                                const SizedBox(height: 6),
+                                Text(
+                                  "${_totalEmission.toStringAsFixed(2)} kg CO₂",
+                                  style: GoogleFonts.poppins(
+                                    fontSize: 26,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.black87,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+
+                          // 🌿 Dua kotak statistik
+                          Row(
+                            children: [
+                              Expanded(
+                                child: _buildStatBox(
+                                  "Telah di-offset",
+                                  "${_offsetEmission.toStringAsFixed(2)} kg",
+                                  primaryGreen.withOpacity(0.1),
+                                ),
+                              ),
+                              const SizedBox(width: 10),
+                              Expanded(
+                                child: _buildStatBox(
+                                  "Belum di-offset",
+                                  "${_belumOffset.toStringAsFixed(2)} kg",
+                                  Colors.red.shade50,
+                                ),
+                              ),
+                            ],
+                          ),
+
+                          const SizedBox(height: 20),
+
+                          // 💚 Donasi Sekarang
+                          Center(
+                            child: ElevatedButton(
+                              onPressed: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => DonasiSimulasiScreen(totalEmisi: _totalEmission),
+                                  ),
+                                ).then((_) => _refreshAfterNavigate());
+                              },
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: primaryGreen,
+                                padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 14),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(24),
+                                ),
+                              ),
+                              child: Text(
+                                "Donasi Sekarang",
+                                style: GoogleFonts.poppins(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.w600, // semibold
+                                  fontSize: 16,
+                                ),
                               ),
                             ),
-                            const SizedBox(width: 12),
-                            Expanded(
-                              child: _buildStatCard(
-                                "Belum di-offset",
-                                "${_belumOffset.toStringAsFixed(2)} kg",
-                                Colors.red.shade50,
-                              ),
+                          ),
+
+
+                          const SizedBox(height: 28),
+
+                          // 🌍 Komunitas
+                          Text(
+                            "Komunitas",
+                            style: GoogleFonts.poppins(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.black87,
                             ),
-                          ],
-                        )
-                      ],
+                          ),
+                          const SizedBox(height: 12),
+
+                          SizedBox(
+                            height: 160,
+                            child: ListView(
+                              scrollDirection: Axis.horizontal,
+                              children: [
+                                _buildCommunityCard("Green Batam", "assets/komunitas1.png"),
+                                _buildCommunityCard("Eco Forest ID", "assets/komunitas2.png"),
+                                _buildCommunityCard("Nusantara Hijau", "assets/komunitas3.png"),
+                              ],
+                            ),
+                          ),
+
+                          const SizedBox(height: 28),
+
+                          // 🚗 Rekomendasi & Edukasi
+                          Text(
+                            "Rekomendasi & Edukasi",
+                            style: GoogleFonts.poppins(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.black87,
+                            ),
+                          ),
+                          const SizedBox(height: 12),
+
+                          Column(
+                            children: [
+                              _buildVehicleCard(
+                                icon: Icons.directions_bike,
+                                title: "Gunakan Sepeda",
+                                desc:
+                                    "Selain bebas emisi, bersepeda juga menyehatkan jantung dan paru-paru.",
+                              ),
+                              const SizedBox(height: 12),
+                              _buildVehicleCard(
+                                icon: Icons.directions_bus,
+                                title: "Naik Transportasi Umum",
+                                desc:
+                                    "Berbagi kendaraan membantu menurunkan emisi karbon.",
+                              ),
+                              const SizedBox(height: 12),
+                              _buildVehicleCard(
+                                icon: Icons.energy_savings_leaf,
+                                title: "Gunakan Energi Hijau",
+                                desc:
+                                    "Gunakan sumber energi terbarukan seperti panel surya.",
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
                     ),
                   ),
-                ],
-              ),
-            ),
-
-            // 🌍 Konten bawah scrollable
-            Expanded(
-              child: SingleChildScrollView(
-                padding: const EdgeInsets.all(16),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const SizedBox(height: 20),
-                    const Text("Ayo Donasikan karbonmu di komunitas ini",
-                        style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-                    const SizedBox(height: 12),
-
-                    Center(
-                      child: ElevatedButton.icon(
-                        onPressed: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => DonasiSimulasiScreen(totalEmisi: _totalEmission),
-                            ),
-                          ).then((_) => _refreshAfterNavigate());
-                        },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFF66BB6A),
-                          padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 14),
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
-                          elevation: 6,
-                        ),
-                        icon: const Icon(Icons.favorite, color: Colors.white),
-                        label: const Text(
-                          "Donasi Sekarang",
-                          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16),
-                        ),
-                      ),
-                    ),
-
-                    const SizedBox(height: 20),
-
-                    SizedBox(
-                      height: 160,
-                      child: ListView(
-                        scrollDirection: Axis.horizontal,
-                        children: [
-                          _buildCommunityCard("Komunitas Hijau Bandung", "assets/komunitas1.jpg"),
-                          _buildCommunityCard("Eco Forest Indonesia", "assets/komunitas2.jpg"),
-                          _buildCommunityCard("Tanam Pohon Nusantara", "assets/komunitas3.jpg"),
-                        ],
-                      ),
-                    ),
-
-                    const SizedBox(height: 24),
-                    const Text("Rekomendasi Kendaraan",
-                        style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-                    const SizedBox(height: 8),
-
-                    // ✅ Sekarang rekomendasi kendaraan scroll horizontal
-                    SizedBox(
-                      height: 190, // 🔼 diperbesar dari 170 jadi 190
-                      child: ListView(
-                        scrollDirection: Axis.horizontal,
-                        children: [
-                          _buildVehicleCard(
-                            icon: Icons.directions_bus,
-                            color: Colors.blue,
-                            title: "Komuter 20 km/hari",
-                            subtitle: "Hemat ±3.89 kg CO₂/hari",
-                          ),
-                          _buildVehicleCard(
-                            icon: Icons.pedal_bike,
-                            color: Colors.green,
-                            title: "Sepeda",
-                            subtitle: "0 kg CO₂/hari — baik untuk kesehatan",
-                          ),
-                          _buildVehicleCard(
-                            icon: Icons.directions_walk,
-                            color: Colors.orange,
-                            title: "Jalan Kaki",
-                            subtitle: "0 kg CO₂/hari — alternatif jarak dekat",
-                          ),
-                          _buildVehicleCard(
-                            icon: Icons.electric_scooter,
-                            color: Colors.purple,
-                            title: "Motor Listrik",
-                            subtitle: "±4 kg CO₂/hari — emisi rendah (±0.2 kg/km)",
-                          ),
-                          _buildVehicleCard(
-                            icon: Icons.electric_car,
-                            color: Colors.teal,
-                            title: "Mobil Listrik",
-                            subtitle: "±0.1 kg/km — lebih ramah daripada mobil konvensional",
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
                 ),
-              ),
+              ],
             ),
           ],
         ),
@@ -312,95 +309,108 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Widget _buildStatCard(String label, String value, Color bgColor) {
+  // 🧱 Widget kecil
+  Widget _buildStatBox(String label, String value, Color bgColor) {
     return Container(
-      padding: const EdgeInsets.all(12),
+      padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
         color: bgColor,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: Colors.black12),
       ),
       child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(label, style: const TextStyle(fontWeight: FontWeight.w500, fontSize: 13)),
-          const SizedBox(height: 4),
+          Text(label,
+              style: GoogleFonts.poppins(
+                  fontSize: 13, fontWeight: FontWeight.w600, color: Colors.black87)),
+          const SizedBox(height: 6),
           Text(value,
-              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.black87)),
+              style: GoogleFonts.poppins(
+                  fontSize: 16, fontWeight: FontWeight.bold, color: Colors.black87)),
         ],
       ),
     );
   }
 
-  Widget _buildCommunityCard(String title, String imagePath) {
-    return Container(
-      width: 220,
-      margin: const EdgeInsets.only(right: 12),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(16),
-        image: DecorationImage(image: AssetImage(imagePath), fit: BoxFit.cover),
-        boxShadow: [
-          BoxShadow(color: Colors.black.withOpacity(0.15), blurRadius: 8, offset: const Offset(0, 4))
-        ],
-      ),
+  Widget _buildCommunityCard(String title, String img) {
+    return GestureDetector(
+      onTap: () => Navigator.pushNamed(context, "/komunitas", arguments: title),
       child: Container(
+        width: 220,
+        margin: const EdgeInsets.only(right: 14),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(16),
-          gradient: LinearGradient(
-            colors: [Colors.black.withOpacity(0.6), Colors.transparent],
-            begin: Alignment.bottomCenter,
-            end: Alignment.topCenter,
-          ),
+          image: DecorationImage(image: AssetImage(img), fit: BoxFit.cover),
+          boxShadow: [
+            BoxShadow(
+                color: Colors.black.withOpacity(0.15),
+                blurRadius: 8,
+                offset: const Offset(0, 4))
+          ],
         ),
-        child: Align(
-          alignment: Alignment.bottomLeft,
-          child: Padding(
-            padding: const EdgeInsets.all(12),
-            child: Text(title,
-                style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 14)),
+        child: Container(
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(16),
+            gradient: LinearGradient(
+              colors: [Colors.black.withOpacity(0.6), Colors.transparent],
+              begin: Alignment.bottomCenter,
+              end: Alignment.topCenter,
+            ),
+          ),
+          child: Align(
+            alignment: Alignment.bottomLeft,
+            child: Padding(
+              padding: const EdgeInsets.all(12),
+              child: Text(
+                title,
+                style: GoogleFonts.poppins(
+                  color: Colors.white,
+                  fontSize: 14,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
           ),
         ),
       ),
     );
   }
 
-  // 🔧 Widget tambahan untuk rekomendasi kendaraan (horizontal card)
   Widget _buildVehicleCard({
     required IconData icon,
-    required Color color,
     required String title,
-    required String subtitle,
+    required String desc,
   }) {
     return Container(
-      width: 220,
-      margin: const EdgeInsets.only(right: 12),
-      child: Card(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        elevation: 4,
-        child: Padding(
-          padding: const EdgeInsets.all(10), // 🔽 sedikit dikurangi padding biar lega
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Icon(icon, color: color, size: 34),
-              const SizedBox(height: 8),
-              Text(title, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
-              const SizedBox(height: 4),
-              Text(subtitle, style: const TextStyle(fontSize: 12)),
-              const Spacer(),
-              Align(
-                alignment: Alignment.bottomRight,
-                child: ElevatedButton(
-                  onPressed: () {},
-                  style: ElevatedButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6), // 🔽 tombol diperkecil
-                    backgroundColor: Colors.green,
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                  ),
-                  child: const Text("Pilih", style: TextStyle(fontSize: 12)), // 🔽 teks tombol juga lebih kecil
-                ),
-              ),
-            ],
+      width: double.infinity,
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: primaryGreen.withOpacity(0.05),
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: primaryGreen.withOpacity(0.1)),
+      ),
+      child: Row(
+        children: [
+          Icon(icon, color: primaryGreen, size: 30),
+          const SizedBox(width: 14),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(title,
+                    style: GoogleFonts.poppins(
+                        fontSize: 14,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black87)),
+                const SizedBox(height: 4),
+                Text(desc,
+                    style: GoogleFonts.poppins(
+                        fontSize: 12, color: Colors.black54, height: 1.3)),
+              ],
+            ),
           ),
-        ),
+        ],
       ),
     );
   }
