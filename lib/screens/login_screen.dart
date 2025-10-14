@@ -201,7 +201,7 @@ class _LoginScreenState extends State<LoginScreen>
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             const SizedBox(height: 90),
-            Image.asset('assets/logo.png', height: 110),
+            Image.asset('assets/logo.png', height: 170),
             const SizedBox(height: 25),
             Text(
               "Hitung Jejakmu, Hijaukan Bumi",
@@ -343,11 +343,6 @@ class _LoginScreenState extends State<LoginScreen>
           }
         }),
         const SizedBox(height: 12),
-        TextButton(
-          onPressed: () => switchPage("login"),
-          child: const Text("Sudah terverifikasi? Masuk",
-              style: TextStyle(color: Colors.black54)),
-        ),
       ],
     );
   }
