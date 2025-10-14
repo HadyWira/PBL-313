@@ -27,7 +27,6 @@ class _LoginScreenState extends State<LoginScreen>
   final Color tealColor = const Color(0xFF3E5F44);
   final Color darkText = const Color(0xFF2E3A3A);
 
-  // 🔙 Fungsi untuk menentukan halaman sebelumnya
   String? getPreviousPage() {
     switch (currentPage) {
       case "login":
@@ -64,15 +63,20 @@ class _LoginScreenState extends State<LoginScreen>
             ),
           ),
 
-          // 🌤️ Lapisan awan SVG
-          Positioned.fill(
-            child: SvgPicture.asset(
-              'assets/awan.svg',
-              fit: BoxFit.cover,
+          // 🌤️ Awan hanya di halaman Welcome
+          if (currentPage == "welcome")
+            Positioned(
+              top: MediaQuery.of(context).size.height * 0.05,
+              left: 0,
+              right: 0,
+              child: SvgPicture.asset(
+                'assets/awan.svg',
+                width: MediaQuery.of(context).size.width,
+                fit: BoxFit.cover,
+              ),
             ),
-          ),
 
-          // 🏔️ Lengkungan SVG dinamis
+          // 🏔️ Lengkungan bawah / atas tergantung halaman
           if (currentPage == "welcome")
             Align(
               alignment: Alignment.bottomCenter,
@@ -100,7 +104,7 @@ class _LoginScreenState extends State<LoginScreen>
               ),
             ),
 
-          // 🌿 Tombol Back (kecuali di halaman welcome)
+          // 🔙 Tombol Kembali (kecuali di halaman Welcome)
           if (currentPage != "welcome")
             SafeArea(
               child: Padding(
@@ -123,7 +127,7 @@ class _LoginScreenState extends State<LoginScreen>
               opacity: animation,
               child: SlideTransition(
                 position: Tween(
-                  begin: const Offset(0.1, 0),
+                  begin: const Offset(0.0, 1),
                   end: Offset.zero,
                 ).animate(animation),
                 child: child,
@@ -136,7 +140,7 @@ class _LoginScreenState extends State<LoginScreen>
     );
   }
 
-  // 🌿 Pemilih halaman
+  // 🌿 Pemilih Halaman
   Widget _buildPage(String page) {
     switch (page) {
       case "welcome":
@@ -158,7 +162,7 @@ class _LoginScreenState extends State<LoginScreen>
     }
   }
 
-  // 🌿 Wrapper halaman dengan footer
+  // 🌿 Wrapper Halaman dengan Footer
   Widget _pageWithFooter(Widget content) {
     return Column(
       children: [
@@ -290,7 +294,7 @@ class _LoginScreenState extends State<LoginScreen>
     );
   }
 
-  // 🌿 Verify Page (Registrasi & Reset Password)
+  // 🌿 Verify Page
   Widget _verifyPage({bool isReset = false}) {
     return _pageWrapper(
       title: "Verifikasi Akun Anda",
@@ -389,7 +393,7 @@ class _LoginScreenState extends State<LoginScreen>
     );
   }
 
-  // 🌿 Wrapper konten umum
+  // 🌿 Wrapper umum halaman
   Widget _pageWrapper({
     required String title,
     String? subtitle,

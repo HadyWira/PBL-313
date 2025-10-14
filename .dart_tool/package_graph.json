@@ -15,6 +15,7 @@
         "flutter",
         "flutter_localizations",
         "flutter_map",
+        "flutter_svg",
         "font_awesome_flutter",
         "geolocator",
         "google_fonts",
@@ -22,6 +23,7 @@
         "google_maps_flutter_web",
         "latlong2",
         "location",
+        "pin_code_fields",
         "shared_preferences"
       ],
       "devDependencies": [
@@ -44,6 +46,17 @@
         "stream_channel",
         "test_api",
         "vector_math"
+      ]
+    },
+    {
+      "name": "flutter_svg",
+      "version": "2.2.1",
+      "dependencies": [
+        "flutter",
+        "http",
+        "vector_graphics",
+        "vector_graphics_codec",
+        "vector_graphics_compiler"
       ]
     },
     {
@@ -163,6 +176,13 @@
         "firebase_core_web",
         "flutter",
         "meta"
+      ]
+    },
+    {
+      "name": "pin_code_fields",
+      "version": "8.0.1",
+      "dependencies": [
+        "flutter"
       ]
     },
     {
@@ -290,6 +310,42 @@
         "stream_channel",
         "string_scanner",
         "term_glyph"
+      ]
+    },
+    {
+      "name": "vector_graphics_compiler",
+      "version": "1.1.19",
+      "dependencies": [
+        "args",
+        "meta",
+        "path",
+        "path_parsing",
+        "vector_graphics_codec",
+        "xml"
+      ]
+    },
+    {
+      "name": "vector_graphics_codec",
+      "version": "1.1.13",
+      "dependencies": []
+    },
+    {
+      "name": "vector_graphics",
+      "version": "1.1.19",
+      "dependencies": [
+        "flutter",
+        "http",
+        "vector_graphics_codec"
+      ]
+    },
+    {
+      "name": "http",
+      "version": "1.5.0",
+      "dependencies": [
+        "async",
+        "http_parser",
+        "meta",
+        "web"
       ]
     },
     {
@@ -457,16 +513,6 @@
       "version": "2.6.1",
       "dependencies": [
         "meta"
-      ]
-    },
-    {
-      "name": "http",
-      "version": "1.5.0",
-      "dependencies": [
-        "async",
-        "http_parser",
-        "meta",
-        "web"
       ]
     },
     {
@@ -669,11 +715,26 @@
       ]
     },
     {
-      "name": "js",
-      "version": "0.6.7",
+      "name": "xml",
+      "version": "6.6.1",
       "dependencies": [
-        "meta"
+        "collection",
+        "meta",
+        "petitparser"
       ]
+    },
+    {
+      "name": "path_parsing",
+      "version": "1.1.0",
+      "dependencies": [
+        "meta",
+        "vector_math"
+      ]
+    },
+    {
+      "name": "args",
+      "version": "2.7.0",
+      "dependencies": []
     },
     {
       "name": "http_parser",
@@ -683,6 +744,13 @@
         "source_span",
         "string_scanner",
         "typed_data"
+      ]
+    },
+    {
+      "name": "js",
+      "version": "0.6.7",
+      "dependencies": [
+        "meta"
       ]
     },
     {
@@ -805,6 +873,14 @@
       "name": "vm_service",
       "version": "15.0.2",
       "dependencies": []
+    },
+    {
+      "name": "petitparser",
+      "version": "7.0.1",
+      "dependencies": [
+        "collection",
+        "meta"
+      ]
     },
     {
       "name": "fixnum",
