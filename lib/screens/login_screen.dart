@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:pin_code_fields/pin_code_fields.dart';
 import 'home_screen.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -26,6 +27,26 @@ class _LoginScreenState extends State<LoginScreen>
   final Color tealColor = const Color(0xFF3E5F44);
   final Color darkText = const Color(0xFF2E3A3A);
 
+  // 🔙 Fungsi untuk menentukan halaman sebelumnya
+  String? getPreviousPage() {
+    switch (currentPage) {
+      case "login":
+        return "welcome";
+      case "register":
+        return "login";
+      case "verify":
+        return "register";
+      case "verifyReset":
+        return "forgot";
+      case "resetPassword":
+        return "verifyReset";
+      case "forgot":
+        return "login";
+      default:
+        return null;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -43,7 +64,7 @@ class _LoginScreenState extends State<LoginScreen>
             ),
           ),
 
-          // 🌤️ Lapisan awan SVG (background lembut)
+          // 🌤️ Lapisan awan SVG
           Positioned.fill(
             child: SvgPicture.asset(
               'assets/awan.svg',
@@ -53,27 +74,45 @@ class _LoginScreenState extends State<LoginScreen>
 
           // 🏔️ Lengkungan SVG dinamis
           if (currentPage == "welcome")
-          Align(
-            alignment: Alignment.bottomCenter,
-            child: Transform.translate(
-              offset: const Offset(0, 60), // nilai positif = turun
-              child: SvgPicture.asset(
-                'assets/vector.svg',
-                fit: BoxFit.contain,
-                width: double.infinity,
-                height: MediaQuery.of(context).size.height * 0.35,
+            Align(
+              alignment: Alignment.bottomCenter,
+              child: Transform.translate(
+                offset: const Offset(0, 60),
+                child: SvgPicture.asset(
+                  'assets/vector.svg',
+                  fit: BoxFit.contain,
+                  width: double.infinity,
+                  height: MediaQuery.of(context).size.height * 0.35,
+                ),
               ),
-            ),
-          )
-
+            )
           else
             Align(
               alignment: Alignment.topCenter,
-              child: SvgPicture.asset(
-                'assets/vector.svg',
-                fit: BoxFit.contain,
-                width: double.infinity,
-                height: MediaQuery.of(context).size.height * 0.32, // 🔹 lebih halus
+              child: Transform.translate(
+                offset: const Offset(0, -20),
+                child: SvgPicture.asset(
+                  'assets/vector.svg',
+                  fit: BoxFit.contain,
+                  width: double.infinity,
+                  height: MediaQuery.of(context).size.height * 0.3,
+                ),
+              ),
+            ),
+
+          // 🌿 Tombol Back (kecuali di halaman welcome)
+          if (currentPage != "welcome")
+            SafeArea(
+              child: Padding(
+                padding: const EdgeInsets.only(left: 8, top: 8),
+                child: IconButton(
+                  icon: const Icon(Icons.arrow_back_ios_new_rounded,
+                      color: Colors.black87),
+                  onPressed: () {
+                    final prev = getPreviousPage();
+                    if (prev != null) switchPage(prev);
+                  },
+                ),
               ),
             ),
 
@@ -97,6 +136,7 @@ class _LoginScreenState extends State<LoginScreen>
     );
   }
 
+  // 🌿 Pemilih halaman
   Widget _buildPage(String page) {
     switch (page) {
       case "welcome":
@@ -107,6 +147,10 @@ class _LoginScreenState extends State<LoginScreen>
         return _pageWithFooter(_registerPage());
       case "verify":
         return _pageWithFooter(_verifyPage());
+      case "verifyReset":
+        return _pageWithFooter(_verifyPage(isReset: true));
+      case "resetPassword":
+        return _pageWithFooter(_resetPasswordPage());
       case "forgot":
         return _pageWithFooter(_forgotPasswordPage());
       default:
@@ -153,13 +197,7 @@ class _LoginScreenState extends State<LoginScreen>
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             const SizedBox(height: 90),
-
-            // 🪴 Logo di bagian atas tengah
-            Image.asset(
-              'assets/logo.png',
-              height: 110,
-            ),
-
+            Image.asset('assets/logo.png', height: 110),
             const SizedBox(height: 25),
             Text(
               "Hitung Jejakmu, Hijaukan Bumi",
@@ -195,7 +233,6 @@ class _LoginScreenState extends State<LoginScreen>
     return _pageWrapper(
       title: "Masuk",
       subtitle: "Silahkan isi data anda sebelum masuk",
-      showTopImage: true,
       children: [
         _inputField("Email", icon: Icons.email_outlined),
         const SizedBox(height: 16),
@@ -232,7 +269,6 @@ class _LoginScreenState extends State<LoginScreen>
     return _pageWrapper(
       title: "Daftar",
       subtitle: "Silahkan isi data anda untuk mendaftar.",
-      showTopImage: true,
       children: [
         _inputField("Nama Lengkap", icon: Icons.person_outline),
         const SizedBox(height: 12),
@@ -254,24 +290,52 @@ class _LoginScreenState extends State<LoginScreen>
     );
   }
 
-  // 🌿 Verify Page
-  Widget _verifyPage() {
+  // 🌿 Verify Page (Registrasi & Reset Password)
+  Widget _verifyPage({bool isReset = false}) {
     return _pageWrapper(
       title: "Verifikasi Akun Anda",
-      subtitle: "Masukkan kode yang dikirim ke email Anda.",
-      showTopImage: true,
+      subtitle: isReset
+          ? "Masukkan kode yang dikirim ke email Anda untuk reset password."
+          : "Masukkan kode yang dikirim ke email Anda.",
       children: [
-        _inputField("Kode Verifikasi", icon: Icons.verified_outlined),
+        const SizedBox(height: 10),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 20),
+          child: PinCodeTextField(
+            appContext: context,
+            length: 6,
+            animationType: AnimationType.fade,
+            keyboardType: TextInputType.number,
+            pinTheme: PinTheme(
+              shape: PinCodeFieldShape.box,
+              borderRadius: BorderRadius.circular(10),
+              fieldHeight: 50,
+              fieldWidth: 45,
+              activeFillColor: Colors.white,
+              inactiveFillColor: Colors.white,
+              selectedFillColor: const Color(0xFF59B997).withOpacity(0.2),
+              activeColor: const Color(0xFF59B997),
+              selectedColor: const Color(0xFF59B997),
+              inactiveColor: Colors.grey.shade300,
+            ),
+            enableActiveFill: true,
+            onChanged: (value) {},
+          ),
+        ),
         const SizedBox(height: 24),
         _animatedButton("Verifikasi", () async {
           setState(() => isLoading = true);
           await Future.delayed(const Duration(seconds: 1));
           setState(() => isLoading = false);
           if (mounted) {
-            Navigator.pushReplacement(
-              context,
-              MaterialPageRoute(builder: (_) => const HomeScreen()),
-            );
+            if (isReset) {
+              switchPage("resetPassword");
+            } else {
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(builder: (_) => const HomeScreen()),
+              );
+            }
           }
         }),
         const SizedBox(height: 12),
@@ -289,11 +353,10 @@ class _LoginScreenState extends State<LoginScreen>
     return _pageWrapper(
       title: "Lupa Kata Sandi",
       subtitle: "Masukkan email Anda untuk reset password.",
-      showTopImage: true,
       children: [
         _inputField("Email", icon: Icons.email_outlined),
         const SizedBox(height: 24),
-        _animatedButton("Kirim", () => switchPage("login")),
+        _animatedButton("Kirim", () => switchPage("verifyReset")),
         const SizedBox(height: 12),
         TextButton(
           onPressed: () => switchPage("login"),
@@ -304,12 +367,33 @@ class _LoginScreenState extends State<LoginScreen>
     );
   }
 
-  // 🌿 Wrapper konten
+  // 🌿 Reset Password Page
+  Widget _resetPasswordPage() {
+    return _pageWrapper(
+      title: "Atur Ulang Kata Sandi",
+      subtitle: "Masukkan password baru Anda.",
+      children: [
+        _inputField("Password Baru", icon: Icons.lock_outline, obscure: true),
+        const SizedBox(height: 12),
+        _inputField("Konfirmasi Password",
+            icon: Icons.lock_reset, obscure: true),
+        const SizedBox(height: 28),
+        _animatedButton("Simpan Password", () {
+          setState(() => isLoading = true);
+          Future.delayed(const Duration(seconds: 1), () {
+            setState(() => isLoading = false);
+            switchPage("login");
+          });
+        }),
+      ],
+    );
+  }
+
+  // 🌿 Wrapper konten umum
   Widget _pageWrapper({
     required String title,
     String? subtitle,
     required List<Widget> children,
-    bool showTopImage = false,
   }) {
     return SafeArea(
       child: Center(
@@ -318,16 +402,6 @@ class _LoginScreenState extends State<LoginScreen>
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              if (showTopImage) ...[
-                const SizedBox(height: 50),
-                Center(
-                  child: Image.asset(
-                    'assets/logo.png',
-                    height: 100,
-                  ),
-                ),
-                const SizedBox(height: 40),
-              ],
               Container(
                 width: double.infinity,
                 padding:
@@ -348,7 +422,6 @@ class _LoginScreenState extends State<LoginScreen>
                   children: [
                     Text(
                       title,
-                      textAlign: TextAlign.start,
                       style: GoogleFonts.poppins(
                         fontSize: 24,
                         fontWeight: FontWeight.bold,
