@@ -1,7 +1,9 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:pin_code_fields/pin_code_fields.dart';
+import 'package:flutter/services.dart' show rootBundle;
 import 'home_screen.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -15,6 +17,10 @@ class _LoginScreenState extends State<LoginScreen>
     with SingleTickerProviderStateMixin {
   String currentPage = "welcome";
   bool isLoading = false;
+
+  // ✨ Controller input login
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
 
   void switchPage(String page) {
     setState(() {
@@ -232,27 +238,39 @@ class _LoginScreenState extends State<LoginScreen>
     );
   }
 
-  // 🌿 Login Page
+  // 🌿 Login Page (dengan validasi dummy JSON)
   Widget _loginPage() {
     return _pageWrapper(
       title: "Masuk",
       subtitle: "Silahkan isi data anda sebelum masuk",
       children: [
-        _inputField("Email", icon: Icons.email_outlined),
+        _inputField("Email",
+            icon: Icons.email_outlined, controller: _emailController),
         const SizedBox(height: 16),
-        _inputField("Password", icon: Icons.lock_outline, obscure: true),
+
+        // 🟩 Di sini ditambahkan fitur tekan Enter otomatis login
+        TextField(
+          controller: _passwordController,
+          obscureText: true,
+          onSubmitted: (_) => _handleLogin(), // 🔹 ENTER TRIGGER LOGIN
+          decoration: InputDecoration(
+            prefixIcon: const Icon(Icons.lock_outline, color: Colors.teal),
+            labelText: "Password",
+            filled: true,
+            fillColor: Colors.grey.shade50,
+            labelStyle: const TextStyle(color: Colors.black87),
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(14),
+              borderSide: BorderSide(color: Colors.grey.shade300),
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(14),
+              borderSide: const BorderSide(color: Colors.teal, width: 1.8),
+            ),
+          ),
+        ),
         const SizedBox(height: 28),
-        _animatedButton("Masuk", () async {
-          setState(() => isLoading = true);
-          await Future.delayed(const Duration(seconds: 1));
-          setState(() => isLoading = false);
-          if (mounted) {
-            Navigator.pushReplacement(
-              context,
-              MaterialPageRoute(builder: (_) => const HomeScreen()),
-            );
-          }
-        }),
+        _animatedButton("Masuk", _handleLogin),
         const SizedBox(height: 10),
         TextButton(
           onPressed: () => switchPage("forgot"),
@@ -266,6 +284,42 @@ class _LoginScreenState extends State<LoginScreen>
         ),
       ],
     );
+  }
+
+  // 🔹 Fungsi login utama (dipakai tombol & enter)
+  Future<void> _handleLogin() async {
+    setState(() => isLoading = true);
+    await Future.delayed(const Duration(milliseconds: 800));
+
+    final email = _emailController.text.trim();
+    final password = _passwordController.text.trim();
+
+    // 🔹 Ambil data dummy user
+    final String jsonString =
+        await rootBundle.loadString('assets/dummy_login.json');
+    final List<dynamic> users = json.decode(jsonString);
+
+    // 🔹 Cek apakah cocok
+    final user = users.firstWhere(
+      (u) => u['email'] == email && u['password'] == password,
+      orElse: () => null,
+    );
+
+    setState(() => isLoading = false);
+
+    if (user != null && mounted) {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (_) => const HomeScreen()),
+      );
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("Email atau password salah."),
+          backgroundColor: Colors.redAccent,
+        ),
+      );
+    }
   }
 
   // 🌿 Register Page
@@ -317,7 +371,8 @@ class _LoginScreenState extends State<LoginScreen>
               fieldWidth: 45,
               activeFillColor: Colors.white,
               inactiveFillColor: Colors.white,
-              selectedFillColor: const Color(0xFF59B997).withOpacity(0.2),
+              selectedFillColor:
+                  const Color(0xFF59B997).withOpacity(0.2),
               activeColor: const Color(0xFF59B997),
               selectedColor: const Color(0xFF59B997),
               inactiveColor: Colors.grey.shade300,
@@ -449,9 +504,13 @@ class _LoginScreenState extends State<LoginScreen>
     );
   }
 
-  // 🌿 Input Field
-  Widget _inputField(String label, {bool obscure = false, IconData? icon}) {
+  // 🌿 Input Field umum
+  Widget _inputField(String label,
+      {bool obscure = false,
+      IconData? icon,
+      TextEditingController? controller}) {
     return TextField(
+      controller: controller,
       obscureText: obscure,
       decoration: InputDecoration(
         prefixIcon: Icon(icon, color: Colors.teal),

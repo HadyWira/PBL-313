@@ -704,7 +704,7 @@ class _ResultScreenState extends State<ResultScreen> {
             Navigator.pushReplacement(
               context,
               MaterialPageRoute(
-                builder: (_) => const RiwayatPerjalananPage(),
+                builder: (_) => RiwayatPerjalananPage(),
               ),
             );
           } else if (index == 1) {

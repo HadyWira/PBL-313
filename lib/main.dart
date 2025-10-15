@@ -33,7 +33,7 @@ class MyApp extends StatelessWidget {
         "/fuel": (context) => const FuelSelectionPage(selectedVehicle: ''),
         "/tracking": (context) =>
         const TrackingScreen(vehicle: '', fuelType: ''),
-        "/riwayat": (context) => const RiwayatPerjalananPage(),
+        "/riwayat": (context) => RiwayatPerjalananPage(),
       },
     );
   }
